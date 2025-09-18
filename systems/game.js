@@ -13,6 +13,33 @@ let showcaseBear = null;
 let showcaseFish = null;
 let activeFishes = [];
 
+// --- UTILITY ---
+function disposeGroup(group) {
+    if (!group) return;
+
+    // Traverse the group to dispose of geometries, materials, and textures
+    group.traverse((object) => {
+        if (object.isMesh) {
+            if (object.geometry) {
+                object.geometry.dispose();
+            }
+            if (object.material) {
+                // If the material is an array, dispose of each material
+                if (Array.isArray(object.material)) {
+                    object.material.forEach(material => material.dispose());
+                } else {
+                    object.material.dispose();
+                }
+            }
+        }
+    });
+
+    // Remove the group from its parent
+    if (group.parent) {
+        group.parent.remove(group);
+    }
+}
+
 // --- UI & STATE ---
 const { startButton } = bindUI();
 let playerProgress = getPlayerProgress();
@@ -22,12 +49,20 @@ let isFirstLoad = true;
 
 function refreshShowcase() {
     console.log('[Verbose] Refreshing showcase scene.');
-    if (showcaseBear) { scene.remove(showcaseBear); showcaseBear = null; }
-    if (showcaseFish) { 
-        if(showcaseFish.parent) showcaseFish.parent.remove(showcaseFish);
-        else scene.remove(showcaseFish); 
-        showcaseFish = null; 
+    // --- Complete Disposal of Old Objects ---
+    if (showcaseBear) {
+        console.log('[Verbose] Disposing old showcase bear.');
+        disposeGroup(showcaseBear);
+        showcaseBear = null;
     }
+    // No need to dispose showcaseFish separately as it's a child of showcaseBear.
+    // However, if it could exist independently, this is how you'd handle it.
+    if (showcaseFish && !showcaseFish.parent) {
+        console.log('[Verbose] Disposing orphaned showcase fish.');
+        disposeGroup(showcaseFish);
+        showcaseFish = null;
+    }
+
     // Bear showcase
     console.log('[Verbose] Creating new showcase bear...');
     showcaseBear = createBear(playerProgress.selectedBear);
