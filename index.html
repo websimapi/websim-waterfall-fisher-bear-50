@@ -2,42 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coffee Video</title>
-    <style>
-        body, html, #app {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f0f0;
-        }
-        .remotion-player-container {
-            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Splashy Bear</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <script type="importmap">
     {
         "imports": {
-            "react": "https://esm.sh/react@18.3.1?dev",
-            "react-dom": "https://esm.sh/react-dom@18.3.1?dev",
-            "react-dom/client": "https://esm.sh/react-dom@18.3.1/client?dev",
-            "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime?dev",
-            "react/jsx-dev-runtime": "https://esm.sh/react@18.3.1/jsx-dev-runtime?dev",
-            "remotion": "https://esm.sh/remotion@4.0.350?external=react,react-dom&dev",
-            "@remotion/player": "https://esm.sh/@remotion/player@4.0.350?external=react,react-dom&dev",
-            "@remotion/transitions": "https://esm.sh/@remotion/transitions@4.0.350?external=react,react-dom,remotion&dev",
-            "@websim/remotion/player": "https://esm.websim.com/@websim/remotion/player"
+            "three": "https://esm.sh/three@0.160.0",
+            "three/addons/": "https://esm.sh/three@0.160.0/examples/jsm/"
         }
     }
     </script>
 </head>
 <body>
-    <div id="app"></div>
-    <script type="module" src="./main.jsx"></script>
+    <div id="game-container"></div>
+    <div id="ui-container">
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <img src="/splashy_bear_logo.png" alt="Splashy Bear Logo" id="game-logo">
+            <div id="start-screen-content">
+                <!-- Quick Choices -->
+                <div id="quick-choices">
+                    <div id="choose-bear" class="unlock-box active">
+                        <img src="/bear_unlock.png" alt="Selected Bear">
+                        <span>Splashy Bear</span>
+                    </div>
+                    <div id="choose-fish" class="unlock-box active">
+                        <img src="/fish_unlock.png" alt="Selected Fish">
+                        <span>Classic Fish</span>
+                    </div>
+                </div>
+
+                <!-- Full Unlock Selection Panel (hidden by default) -->
+                <div id="unlocks-container" class="hidden">
+                    <div class="selection-header">
+                        <button id="selection-back">&lt; Back</button>
+                        <h2 id="selection-title">Select Bear</h2>
+                    </div>
+                    <div id="bear-category" class="unlock-category">
+                        <div id="bear-unlocks" class="unlock-grid">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+                    <div id="fish-category" class="unlock-category">
+                        <div id="fish-unlocks" class="unlock-grid">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div id="start-button-container">
+                <button id="start-button">START</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="hidden">
+            <h1>Game Over</h1>
+            <p>Final Score: <span id="final-score">0</span></p>
+        </div>
+
+        <!-- In-Game HUD -->
+        <div id="score-container" class="hidden">
+            <span class="score-label">SCORE</span>
+            <span id="score">0</span>
+        </div>
+        <div id="streak-container" class="hidden">
+             <span class="streak-label">STREAK</span>
+            <span id="streak">x1</span>
+        </div>
+        
+        <button id="dev-console-button" class="hidden">DEV</button>
+    </div>
+    <script type="module" src="./main.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
