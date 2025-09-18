@@ -1,0 +1,61 @@
+
+```json
+{
+  "issue": "Missing arm and fish on bear model during the retry/start screen.",
+  "summary": "A persistent bug where the bear model on the start screen (especially after a game ends, i.e., 'retry screen') fails to render its right arm and the fish it's supposed to be holding. Multiple attempts have been made to fix this, focusing on object creation, disposal, and scene management.",
+  "attempts": [
+    {
+      "id": 1,
+      "date": "Session N-4",
+      "description": "Complete Bear Model Refactor",
+      "hypothesis": "The original bear model's structure was complex, making it difficult to reliably access parts for animation or attachment. Parts were likely being lost or not correctly re-parented during the transition from the game-over state to the start screen.",
+      "actions": [
+        "Rewrote the `createBear` function in `entities/bear.js` entirely.",
+        "Introduced a `bodyParts` dictionary on the bear `THREE.Group` to store direct references to all component meshes (head, torso, arms, etc.) upon creation.",
+        "Implemented a 'pivot' system for the arms. Each arm mesh is now a child of a `THREE.Group` (e.g., `rightArmPivot`). This pivot is then attached to the bear's body, simplifying rotations and providing a stable attachment point.",
+        "Created a specific method, `bearGroup.getFishHoldingHand()`, to ensure a consistent and reliable way to get the fish attachment point (the right arm pivot).",
+        "Added extensive `console.log` statements during bear creation to trace the process and verify each part is created."
+      ],
+      "outcome": "The refactor initially made things worse, with the user reporting that the bear's head was now also missing, indicating a fundamental issue with how the newly structured object was being handled or rendered."
+    },
+    {
+      "id": 2,
+      "date": "Session N-3",
+      "description": "Fixing Part Visibility and Hierarchy",
+      "hypothesis": "Following the refactor, the issue was likely related to how the individual parts were being added to the main `bearGroup`. A part might be created but not correctly added to the scene graph, or a parent object might not be visible.",
+      "actions": [
+        "Reviewed the `createBear` function to ensure every created mesh and pivot group was correctly added to the main `bearGroup` using `bearGroup.add(...)`.",
+        "Verified the local positions of each part to ensure they were not being created far from the model's origin.",
+        "The logic that fixed the missing head was to ensure it was properly created and added directly to the main `bearGroup`.",
+        "Applied the same verification logic to the arm pivots and meshes."
+      ],
+      "outcome": "This fixed the missing head issue. However, the user reported the arm and fish were still missing on the retry screen, suggesting the problem was specific to those parts or how they were handled during the scene reset."
+    },
+    {
+      "id": 3,
+      "date": "Session N-2",
+      "description": "Scene Management and Object Disposal",
+      "hypothesis": "The problem might not be in the creation of the bear, but in the cleanup process between games. If the old 'showcase bear' and its parts were not being properly removed from the scene or disposed of, it could lead to rendering glitches, orphaned objects, or incorrect references when the new showcase bear is created.",
+      "actions": [
+        "Implemented a robust `disposeGroup` function in `systems/game.js`. This function traverses a `THREE.Group` and explicitly calls `.dispose()` on all geometries and materials to free up GPU memory and prevent artifacts.",
+        "Modified the `refreshShowcase` function to explicitly call `disposeGroup(showcaseBear)` before creating a new one.",
+        "Ensured the showcase fish was also explicitly removed from its parent or the scene before being disposed of, to prevent it from becoming an orphaned object in the scene graph."
+      ],
+      "outcome": "The issue persisted. Despite proper cleanup, the arm and fish were still not visible on the retry screen. This indicated the problem was likely happening during the creation or attachment phase within the `refreshShowcase` function itself."
+    },
+    {
+      "id": 4,
+      "date": "Session N-1",
+      "description": "Debugging `refreshShowcase` Logic",
+      "hypothesis": "There could be a race condition or a subtle error in the `refreshShowcase` function. The `getFishHoldingHand` method might be failing, or the fish might be added to the scene graph in a way that makes it invisible (e.g., incorrect scale or position).",
+      "actions": [
+        "Added more detailed logging within the `refreshShowcase` function to trace the entire process: disposing old objects, creating new ones, finding the hand, and attaching the fish.",
+        "Included a fallback in the `getFishHoldingHand` lookup to also try `getObjectByName('rightArmPivot')` in case the direct method access failed for any reason.",
+        "Added a fallback position for the fish in case the `fishHoldingHand` was not found at all, which would make the fish visible elsewhere in the scene and confirm if it was being created correctly.",
+        "Verified the local position, rotation, and scale values used when attaching the fish to the bear's hand."
+      ],
+      "outcome": "The user continued to report the arm and fish were missing, leading to the current state. The extensive logging and structural fixes have not yet resolved the root cause, which remains elusive but is clearly tied to the lifecycle of the showcase objects between game sessions."
+    }
+  ],
+  "current_status": "The bug remains unresolved. The core logic for creating the bear and attaching the fish appears structurally sound, but fails in practice during the scene refresh on the retry screen. Future investigation should focus on the Three.js rendering state, potential caching issues, or subtle interactions within the scene graph during the rapid disposal and re-creation of these specific objects."
+}
