@@ -4,28 +4,26 @@ export const BEAR_X_LIMIT = 3.5;
 const BEAR_MOVE_SPEED = 0.08;
 const BEAR_WOBBLE_AMOUNT = 0.2;
 
-// Material definitions
-const MATERIALS = {
-    splashy: {
-        body: new THREE.MeshLambertMaterial({ color: 0x8d5524 }),
-        accent: new THREE.MeshLambertMaterial({ color: 0x4a2d1e }),
-    },
-    grizzly: {
-        body: new THREE.MeshLambertMaterial({ color: 0x6e4a2e }),
-        accent: new THREE.MeshLambertMaterial({ color: 0x3b2818 }),
-    }
-};
-
 export function createBear(type = 'splashy') {
-    console.log(`[Bear V4] Creating bear of type: ${type}`);
+    console.log(`[Bear V5] Creating bear of type: ${type}`);
     
     const bearGroup = new THREE.Group();
     bearGroup.name = 'bear-character';
     
-    // Get materials
-    const materials = MATERIALS[type] || MATERIALS.splashy;
-    const bodyMat = materials.body.clone();
-    const accentMat = materials.accent.clone();
+    // Get materials - **NEW**: Materials are now created fresh each time.
+    const materialDefs = {
+        splashy: {
+            body: new THREE.MeshLambertMaterial({ color: 0x8d5524 }),
+            accent: new THREE.MeshLambertMaterial({ color: 0x4a2d1e }),
+        },
+        grizzly: {
+            body: new THREE.MeshLambertMaterial({ color: 0x6e4a2e }),
+            accent: new THREE.MeshLambertMaterial({ color: 0x3b2818 }),
+        }
+    };
+    const materials = materialDefs[type] || materialDefs.splashy;
+    const bodyMat = materials.body;
+    const accentMat = materials.accent;
     
     // Store parts for easy access
     bearGroup.bodyParts = {};
@@ -37,7 +35,7 @@ export function createBear(type = 'splashy') {
         mesh.position.set(position.x, position.y, position.z);
         bearGroup.add(mesh);
         bearGroup.bodyParts[name] = mesh;
-        console.log(`[Bear V4] Created and added ${name} at position (${position.x}, ${position.y}, ${position.z})`);
+        console.log(`[Bear V5] Created and added ${name} at position (${position.x}, ${position.y}, ${position.z})`);
         return mesh;
     }
     
@@ -65,7 +63,7 @@ export function createBear(type = 'splashy') {
     bearGroup.add(rightArmPivot);
     bearGroup.bodyParts.rightArmPivot = rightArmPivot;
     bearGroup.bodyParts.rightArm = rightArm;
-    console.log('[Bear V4] Created and added right arm pivot (fish-holding arm)');
+    console.log('[Bear V5] Created and added right arm pivot (fish-holding arm)');
     
     // LEFT ARM
     const leftArmPivot = new THREE.Group();
@@ -82,7 +80,7 @@ export function createBear(type = 'splashy') {
     bearGroup.add(leftArmPivot);
     bearGroup.bodyParts.leftArmPivot = leftArmPivot;
     bearGroup.bodyParts.leftArm = leftArm;
-    console.log('[Bear V4] Created and added left arm pivot');
+    console.log('[Bear V5] Created and added left arm pivot');
     
     // Net collision area
     const netGroup = new THREE.Group();
@@ -94,7 +92,7 @@ export function createBear(type = 'splashy') {
     net.position.set(0, -1.3, -0.7);
     netGroup.add(net);
     bearGroup.add(netGroup);
-    console.log('[Bear V4] Added net collision area');
+    console.log('[Bear V5] Added net collision area');
     
     // Set up user data and methods
     bearGroup.userData = {
@@ -107,7 +105,7 @@ export function createBear(type = 'splashy') {
     
     // Method to get the fish-holding hand - ALWAYS return the right arm pivot
     bearGroup.getFishHoldingHand = function() {
-        console.log('[Bear V4] getFishHoldingHand called, returning rightArmPivot:', this.bodyParts.rightArmPivot);
+        console.log('[Bear V5] getFishHoldingHand called, returning rightArmPivot:', this.bodyParts.rightArmPivot);
         return this.bodyParts.rightArmPivot;
     };
     
@@ -115,7 +113,7 @@ export function createBear(type = 'splashy') {
     bearGroup.position.set(0, 4.65, 0.8);
     bearGroup.rotation.y = Math.PI; // Face camera
     
-    console.log('[Bear V4] Bear creation complete. All parts:', Object.keys(bearGroup.bodyParts));
+    console.log('[Bear V5] Bear creation complete. All parts:', Object.keys(bearGroup.bodyParts));
     return bearGroup;
 }
 

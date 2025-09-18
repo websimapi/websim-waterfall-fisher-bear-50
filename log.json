@@ -1,5 +1,3 @@
-
-```json
 {
   "issue": "Missing arm and fish on bear model during the retry/start screen.",
   "summary": "A persistent bug where the bear model on the start screen (especially after a game ends, i.e., 'retry screen') fails to render its right arm and the fish it's supposed to be holding. Multiple attempts have been made to fix this, focusing on object creation, disposal, and scene management.",
@@ -55,7 +53,18 @@
         "Verified the local position, rotation, and scale values used when attaching the fish to the bear's hand."
       ],
       "outcome": "The user continued to report the arm and fish were missing, leading to the current state. The extensive logging and structural fixes have not yet resolved the root cause, which remains elusive but is clearly tied to the lifecycle of the showcase objects between game sessions."
+    },
+    {
+      "id": 5,
+      "date": "Current Session",
+      "description": "Force Resource Isolation and Scene Update",
+      "hypothesis": "There is a subtle caching or state corruption issue with Three.js resources (materials) or the scene graph itself. Rapidly disposing and recreating objects might be causing the renderer to use stale data or have an out-of-date scene graph when attaching children.",
+      "actions": [
+        "Modified `createBear` in `entities/bear.js` to instantiate brand new materials every time it's called, instead of cloning them from a global object. This eliminates any possibility of shared material state causing issues across different bear instances.",
+        "In `refreshShowcase` in `systems/game.js`, added a call to `scene.updateMatrixWorld(true)` immediately after adding the new showcase bear to the scene. This forces an immediate recalculation of all object transformations, ensuring the scene graph is in a consistent state before attempting to find the bear's hand and attach the fish to it."
+      ],
+      "outcome": "Pending."
     }
   ],
-  "current_status": "The bug remains unresolved. The core logic for creating the bear and attaching the fish appears structurally sound, but fails in practice during the scene refresh on the retry screen. Future investigation should focus on the Three.js rendering state, potential caching issues, or subtle interactions within the scene graph during the rapid disposal and re-creation of these specific objects."
+  "current_status": "The bug remains unresolved. The core logic for creating the bear and attaching the fish appears structurally sound, but fails in practice during the scene refresh on the retry screen. The current attempt focuses on preventing resource caching issues and forcing scene graph updates to see if the problem is related to stale rendering state."
 }

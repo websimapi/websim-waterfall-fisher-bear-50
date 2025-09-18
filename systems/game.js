@@ -73,6 +73,10 @@ function refreshShowcase() {
     scene.add(showcaseBear);
     console.log('[Verbose] Showcase bear created and added to scene.', showcaseBear);
     
+    // **NEW**: Force the scene graph to update matrices before trying to find children.
+    console.log('[Verbose] Forcing scene matrix world update.');
+    scene.updateMatrixWorld(true);
+
     // Fish showcase
     console.log('[Verbose] Creating new showcase fish...');
     showcaseFish = createFish(scene, 0, playerProgress.selectedFish);
