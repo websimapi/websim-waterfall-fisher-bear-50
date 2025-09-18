@@ -19,51 +19,79 @@ function createVoxel(x, y, z, w, h, d, mat) {
 }
 
 export function createBear(type = 'splashy') {
-    console.log('[Verbose] Creating bear of type:', type);
+    console.log(`[Verbose Bear] Creating bear of type: ${type}`);
     const group = new THREE.Group();
+    group.name = 'bear-character';
 
     const bodyMat = (type === 'grizzly' ? grizzlyMat : brownMat).clone();
     const accentMat = (type === 'grizzly' ? darkGrizzlyMat : darkBrownMat).clone();
-    console.log('[Verbose] Cloned materials for new bear.');
+    console.log('[Verbose Bear] Cloned materials for new bear.');
 
-    group.add(createVoxel(0, 0, 0, 1.5, 1.5, 1, bodyMat));
-    group.add(createVoxel(0, 1.25, 0, 1, 1, 1, bodyMat));
-    group.add(createVoxel(-0.4, 1.9, 0, 0.3, 0.3, 0.3, accentMat));
-    group.add(createVoxel(0.4, 1.9, 0, 0.3, 0.3, 0.3, accentMat));
-    group.add(createVoxel(0, 1.1, 0.5, 0.5, 0.4, 0.3, accentMat));
-    group.add(createVoxel(-0.5, -1, 0, 0.5, 0.5, 0.5, bodyMat));
-    group.add(createVoxel(0.5, -1, 0, 0.5, 0.5, 0.5, bodyMat));
+    const bodyParts = {};
 
+    // Body
+    bodyParts.torso = createVoxel(0, 0, 0, 1.5, 1.5, 1, bodyMat);
+    bodyParts.torso.name = 'torso';
+
+    // Head & Face
+    bodyParts.head = createVoxel(0, 1.25, 0, 1, 1, 1, bodyMat);
+    bodyParts.head.name = 'head';
+    bodyParts.leftEar = createVoxel(-0.4, 1.9, 0, 0.3, 0.3, 0.3, accentMat);
+    bodyParts.leftEar.name = 'leftEar';
+    bodyParts.rightEar = createVoxel(0.4, 1.9, 0, 0.3, 0.3, 0.3, accentMat);
+    bodyParts.rightEar.name = 'rightEar';
+    bodyParts.snout = createVoxel(0, 1.1, 0.5, 0.5, 0.4, 0.3, accentMat);
+    bodyParts.snout.name = 'snout';
+    
+    // Legs
+    bodyParts.leftLeg = createVoxel(-0.5, -1, 0, 0.5, 0.5, 0.5, bodyMat);
+    bodyParts.leftLeg.name = 'leftLeg';
+    bodyParts.rightLeg = createVoxel(0.5, -1, 0, 0.5, 0.5, 0.5, bodyMat);
+    bodyParts.rightLeg.name = 'rightLeg';
+
+    // Arms
     const armY = 0.1, armZ = -0.3;
     const armWidth = 0.4, armHeight = 1.0, armDepth = 0.4;
     
-    // Left Arm
-    const leftArm = createVoxel(-0.95, armY, armZ, armWidth, armHeight, armDepth, bodyMat);
-    leftArm.name = 'leftArm';
-    leftArm.rotation.z = -Math.PI / 16;
-    group.add(leftArm);
-
-    // Right Arm
-    const rightArm = createVoxel(0.95, armY, armZ, armWidth, armHeight, armDepth, bodyMat);
-    rightArm.name = 'rightArm';
-    rightArm.rotation.z = Math.PI / 16;
-    group.add(rightArm);
+    bodyParts.leftArm = createVoxel(-0.95, armY, armZ, armWidth, armHeight, armDepth, bodyMat);
+    bodyParts.leftArm.name = 'leftArm';
+    bodyParts.leftArm.rotation.z = -Math.PI / 16;
     
-    group.position.set(0, 4.65, 0.8); // Adjusted Y to be on top of the log.
+    bodyParts.rightArm = createVoxel(0.95, armY, armZ, armWidth, armHeight, armDepth, bodyMat);
+    bodyParts.rightArm.name = 'rightArm';
+    bodyParts.rightArm.rotation.z = Math.PI / 16;
+    
+    // Add all parts to the main group
+    for (const partName in bodyParts) {
+        const part = bodyParts[partName];
+        console.log(`[Verbose Bear] Adding part: ${partName}`, part);
+        group.add(part);
+    }
+    
+    group.position.set(0, 4.65, 0.8);
     group.rotation.y = Math.PI;
     group.userData.targetX = 0;
     group.userData.wobbleTimer = 0;
     
-    // add simple translucent net in front of the log
+    // Create a separate group for the net to isolate it
+    const netGroup = new THREE.Group();
+    netGroup.name = 'net-group';
+    group.add(netGroup);
+
     const netWidth = 2.2;
     const netMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
-    netMaterial.visible = false; // Hide the net visually
+    netMaterial.visible = false; // The net is for collision, not for display
+    
     const net = new THREE.Mesh(new THREE.BoxGeometry(netWidth, 0.6, 0.1), netMaterial);
     net.name = 'net';
     net.position.set(0, -1.3, -0.7);
-    group.add(net);
-    group.userData.net = net; group.userData.netWidth = netWidth;
-    console.log('[Verbose] Bear creation complete. Returning group.');
+    netGroup.add(net);
+    console.log('[Verbose Bear] Added net to its own group inside the bear.');
+    
+    group.userData.net = net;
+    group.userData.netWidth = netWidth;
+    
+    console.log('[Verbose Bear] Bear creation complete. Returning group.');
     return group;
 }
 
