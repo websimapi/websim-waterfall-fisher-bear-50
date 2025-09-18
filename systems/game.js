@@ -79,19 +79,19 @@ function refreshShowcase() {
     console.log('[Verbose] Showcase fish created.', showcaseFish);
     showcaseFish.name = 'showcase-fish';  
 
-    // Attach fish to bear's hand
+    // Attach fish to bear's hand using the new method
     console.log("[Verbose] Looking for showcase bear's arm to attach fish...");
-    const armToHoldFish = showcaseBear.getObjectByName('leftArmPivot'); // The arm on the screen's left
-    if (armToHoldFish) {
-        console.log('[Verbose] Left arm pivot found! Attaching fish.');
+    const fishHoldingHand = showcaseBear.getFishHoldingHand ? showcaseBear.getFishHoldingHand() : showcaseBear.getObjectByName('rightArmPivot');
+    if (fishHoldingHand) {
+        console.log('[Verbose] Fish holding hand found! Attaching fish.');
         scene.remove(showcaseFish); // remove from main scene to add to arm
-        armToHoldFish.add(showcaseFish);
+        fishHoldingHand.add(showcaseFish);
         showcaseFish.position.set(0.1, -0.7, 0.4);
         showcaseFish.rotation.set(-Math.PI / 4, Math.PI / 2, Math.PI);
         showcaseFish.scale.set(0.5, 0.5, 0.5);
     } else {
         // Fallback position if arm isn't found
-        console.warn('[Verbose] Arm pivot not found on showcase bear!');
+        console.warn('[Verbose] Fish holding hand not found on showcase bear!');
         showcaseFish.position.set(2.0, 2.3, -1.5);
     }
 
@@ -252,7 +252,7 @@ export function updateGame() {
     } else { // IDLE
         gameState.idleAnimTimer += 0.05;
         if (showcaseBear) {
-            const armHoldingFish = showcaseBear.getObjectByName('leftArmPivot');
+            const armHoldingFish = showcaseBear.getFishHoldingHand ? showcaseBear.getFishHoldingHand() : showcaseBear.getObjectByName('rightArmPivot');
             if (armHoldingFish) {
                 const armBob = Math.sin(gameState.idleAnimTimer) * 0.1;
                 armHoldingFish.rotation.x = armBob;
