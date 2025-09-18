@@ -56,10 +56,13 @@ export function createBear(type = 'splashy') {
     rightArmPivot.position.set(-0.95, 0.1, -0.3);
     rightArmPivot.rotation.z = -Math.PI / 16;
     
-    const rightArm = addPart('rightArm', new THREE.BoxGeometry(0.4, 1.0, 0.4), bodyMat, {x: 0, y: 0, z: 0});
+    const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.0, 0.4), bodyMat);
+    rightArm.name = 'rightArm';
+    rightArm.position.set(0, 0, 0);
     rightArmPivot.add(rightArm);
     bearGroup.add(rightArmPivot);
     bearGroup.bodyParts.rightArmPivot = rightArmPivot;
+    bearGroup.bodyParts.rightArm = rightArm;
     console.log('[Bear V3] Created right arm pivot (fish-holding arm)');
     
     // Left arm
@@ -68,10 +71,13 @@ export function createBear(type = 'splashy') {
     leftArmPivot.position.set(0.95, 0.1, -0.3);
     leftArmPivot.rotation.z = Math.PI / 16;
     
-    const leftArm = addPart('leftArm', new THREE.BoxGeometry(0.4, 1.0, 0.4), bodyMat, {x: 0, y: 0, z: 0});
+    const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.0, 0.4), bodyMat);
+    leftArm.name = 'leftArm';
+    leftArm.position.set(0, 0, 0);
     leftArmPivot.add(leftArm);
     bearGroup.add(leftArmPivot);
     bearGroup.bodyParts.leftArmPivot = leftArmPivot;
+    bearGroup.bodyParts.leftArm = leftArm;
     console.log('[Bear V3] Created left arm pivot');
     
     // Net collision area
