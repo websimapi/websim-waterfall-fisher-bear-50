@@ -36,8 +36,8 @@ class Bear extends THREE.Group {
 
         this.bodyParts = {};
 
-        const createPart = (geo, mat, name, pos = {x:0, y:0, z:0}) => {
-            const mesh = new THREE.Mesh(geo, mat);
+        const createPart = (geoFactory, mat, name, pos = {x:0, y:0, z:0}) => {
+            const mesh = new THREE.Mesh(geoFactory(), mat);
             mesh.name = name;
             mesh.position.set(pos.x, pos.y, pos.z);
             this.bodyParts[name] = mesh;
@@ -46,22 +46,14 @@ class Bear extends THREE.Group {
             return mesh;
         };
 
-        // --- GEOMETRIES ---
-        const torsoGeo = new THREE.BoxGeometry(1.5, 1.5, 1);
-        const headGeo = new THREE.BoxGeometry(1, 1, 1);
-        const earGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-        const snoutGeo = new THREE.BoxGeometry(0.5, 0.4, 0.3);
-        const legGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-        const armGeo = new THREE.BoxGeometry(0.4, 1.0, 0.4);
-
-        // --- CREATE PARTS ---
-        createPart(torsoGeo, bodyMat, 'torso');
-        createPart(headGeo, bodyMat, 'head', { y: 1.25 });
-        createPart(earGeo, accentMat, 'leftEar', { x: -0.4, y: 1.9 });
-        createPart(earGeo, accentMat, 'rightEar', { x: 0.4, y: 1.9 });
-        createPart(snoutGeo, accentMat, 'snout', { y: 1.1, z: 0.5 });
-        createPart(legGeo, bodyMat, 'leftLeg', { x: -0.5, y: -1 });
-        createPart(legGeo, bodyMat, 'rightLeg', { x: 0.5, y: -1 });
+        // --- CREATE PARTS WITH FRESH GEOMETRIES ---
+        createPart(() => new THREE.BoxGeometry(1.5, 1.5, 1), bodyMat, 'torso');
+        createPart(() => new THREE.BoxGeometry(1, 1, 1), bodyMat, 'head', { y: 1.25 });
+        createPart(() => new THREE.BoxGeometry(0.3, 0.3, 0.3), accentMat, 'leftEar', { x: -0.4, y: 1.9 });
+        createPart(() => new THREE.BoxGeometry(0.3, 0.3, 0.3), accentMat, 'rightEar', { x: 0.4, y: 1.9 });
+        createPart(() => new THREE.BoxGeometry(0.5, 0.4, 0.3), accentMat, 'snout', { y: 1.1, z: 0.5 });
+        createPart(() => new THREE.BoxGeometry(0.5, 0.5, 0.5), bodyMat, 'leftLeg', { x: -0.5, y: -1 });
+        createPart(() => new THREE.BoxGeometry(0.5, 0.5, 0.5), bodyMat, 'rightLeg', { x: 0.5, y: -1 });
 
         // --- ARMS WITH PIVOTS ---
         // The bear is created facing forward (+Z). Anatomical right is -X, left is +X.
@@ -74,7 +66,7 @@ class Bear extends THREE.Group {
         rightArmPivot.name = 'rightArmPivot';
         rightArmPivot.position.set(-0.95, armY, armZ); // -X is anatomical right
         rightArmPivot.rotation.z = -Math.PI / 16;
-        const rightArmMesh = new THREE.Mesh(armGeo, bodyMat);
+        const rightArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.0, 0.4), bodyMat);
         rightArmMesh.name = 'rightArm';
         rightArmPivot.add(rightArmMesh);
         this.add(rightArmPivot);
@@ -86,7 +78,7 @@ class Bear extends THREE.Group {
         leftArmPivot.name = 'leftArmPivot';
         leftArmPivot.position.set(0.95, armY, armZ); // +X is anatomical left
         leftArmPivot.rotation.z = Math.PI / 16;
-        const leftArmMesh = new THREE.Mesh(armGeo, bodyMat);
+        const leftArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.0, 0.4), bodyMat);
         leftArmMesh.name = 'leftArm';
         leftArmPivot.add(leftArmMesh);
         this.add(leftArmPivot);
