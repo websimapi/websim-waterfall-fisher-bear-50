@@ -49,17 +49,31 @@ export function createBear(type = 'splashy') {
     bodyParts.rightLeg = createVoxel(0.5, -1, 0, 0.5, 0.5, 0.5, bodyMat);
     bodyParts.rightLeg.name = 'rightLeg';
 
-    // Arms
+    // --- Arms Refactor with Pivots ---
     const armY = 0.1, armZ = -0.3;
     const armWidth = 0.4, armHeight = 1.0, armDepth = 0.4;
     
-    bodyParts.leftArm = createVoxel(-0.95, armY, armZ, armWidth, armHeight, armDepth, bodyMat);
-    bodyParts.leftArm.name = 'leftArm';
-    bodyParts.leftArm.rotation.z = -Math.PI / 16;
+    // Left Arm
+    const leftArmPivot = new THREE.Group();
+    leftArmPivot.name = 'leftArmPivot';
+    leftArmPivot.position.set(-0.95, armY, armZ);
+    leftArmPivot.rotation.z = -Math.PI / 16;
+    const leftArmMesh = createVoxel(0, 0, 0, armWidth, armHeight, armDepth, bodyMat);
+    leftArmMesh.name = 'leftArm';
+    leftArmPivot.add(leftArmMesh);
+    bodyParts.leftArmPivot = leftArmPivot;
+    console.log('[Verbose Bear] Created left arm with pivot.');
     
-    bodyParts.rightArm = createVoxel(0.95, armY, armZ, armWidth, armHeight, armDepth, bodyMat);
-    bodyParts.rightArm.name = 'rightArm';
-    bodyParts.rightArm.rotation.z = Math.PI / 16;
+    // Right Arm
+    const rightArmPivot = new THREE.Group();
+    rightArmPivot.name = 'rightArmPivot';
+    rightArmPivot.position.set(0.95, armY, armZ);
+    rightArmPivot.rotation.z = Math.PI / 16;
+    const rightArmMesh = createVoxel(0, 0, 0, armWidth, armHeight, armDepth, bodyMat);
+    rightArmMesh.name = 'rightArm';
+    rightArmPivot.add(rightArmMesh);
+    bodyParts.rightArmPivot = rightArmPivot;
+    console.log('[Verbose Bear] Created right arm with pivot.');
     
     // Add all parts to the main group
     for (const partName in bodyParts) {
