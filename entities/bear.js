@@ -1,11 +1,26 @@
 import * as THREE from 'three';
 
-const brownMat = new THREE.MeshLambertMaterial({ color: 0x8d5524 });
-const darkBrownMat = new THREE.MeshLambertMaterial({ color: 0x4a2d1e });
+// --- Material Management ---
+// Centralized materials to ensure fresh clones and prevent state issues.
+const MATERIALS = {
+    splashy: {
+        body: new THREE.MeshLambertMaterial({ color: 0x8d5524 }),
+        accent: new THREE.MeshLambertMaterial({ color: 0x4a2d1e }),
+    },
+    grizzly: {
+        body: new THREE.MeshLambertMaterial({ color: 0x6e4a2e }),
+        accent: new THREE.MeshLambertMaterial({ color: 0x3b2818 }),
+    }
+};
 
-// Grizzly materials
-const grizzlyMat = new THREE.MeshLambertMaterial({ color: 0x6e4a2e });
-const darkGrizzlyMat = new THREE.MeshLambertMaterial({ color: 0x3b2818 });
+function getBearMaterials(type) {
+    const source = MATERIALS[type] || MATERIALS.splashy;
+    console.log(`[Verbose Bear] Cloning materials for ${type} bear.`);
+    return {
+        bodyMat: source.body.clone(),
+        accentMat: source.accent.clone(),
+    };
+}
 
 export const BEAR_X_LIMIT = 3.5;
 const BEAR_MOVE_SPEED = 0.08;
@@ -23,9 +38,7 @@ export function createBear(type = 'splashy') {
     const group = new THREE.Group();
     group.name = 'bear-character';
 
-    const bodyMat = (type === 'grizzly' ? grizzlyMat : brownMat).clone();
-    const accentMat = (type === 'grizzly' ? darkGrizzlyMat : darkBrownMat).clone();
-    console.log('[Verbose Bear] Cloned materials for new bear.');
+    const { bodyMat, accentMat } = getBearMaterials(type);
 
     const bodyParts = {};
 
@@ -50,30 +63,32 @@ export function createBear(type = 'splashy') {
     bodyParts.rightLeg.name = 'rightLeg';
 
     // --- Arms Refactor with Pivots ---
+    // Note: Arm names are swapped to be more intuitive from camera perspective after bear rotation.
+    // 'leftArmPivot' is on the left side of the screen.
     const armY = 0.1, armZ = -0.3;
     const armWidth = 0.4, armHeight = 1.0, armDepth = 0.4;
     
-    // Left Arm
+    // Left Arm (on screen's left, bear's right)
     const leftArmPivot = new THREE.Group();
     leftArmPivot.name = 'leftArmPivot';
-    leftArmPivot.position.set(-0.95, armY, armZ);
-    leftArmPivot.rotation.z = -Math.PI / 16;
+    leftArmPivot.position.set(0.95, armY, armZ);
+    leftArmPivot.rotation.z = Math.PI / 16;
     const leftArmMesh = createVoxel(0, 0, 0, armWidth, armHeight, armDepth, bodyMat);
     leftArmMesh.name = 'leftArm';
     leftArmPivot.add(leftArmMesh);
     bodyParts.leftArmPivot = leftArmPivot;
-    console.log('[Verbose Bear] Created left arm with pivot.');
+    console.log('[Verbose Bear] Created left arm with pivot. Mesh:', leftArmMesh);
     
-    // Right Arm
+    // Right Arm (on screen's right, bear's left)
     const rightArmPivot = new THREE.Group();
     rightArmPivot.name = 'rightArmPivot';
-    rightArmPivot.position.set(0.95, armY, armZ);
-    rightArmPivot.rotation.z = Math.PI / 16;
+    rightArmPivot.position.set(-0.95, armY, armZ);
+    rightArmPivot.rotation.z = -Math.PI / 16;
     const rightArmMesh = createVoxel(0, 0, 0, armWidth, armHeight, armDepth, bodyMat);
     rightArmMesh.name = 'rightArm';
     rightArmPivot.add(rightArmMesh);
     bodyParts.rightArmPivot = rightArmPivot;
-    console.log('[Verbose Bear] Created right arm with pivot.');
+    console.log('[Verbose Bear] Created right arm with pivot. Mesh:', rightArmMesh);
     
     // Add all parts to the main group
     for (const partName in bodyParts) {
