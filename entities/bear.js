@@ -17,7 +17,7 @@ const MATERIALS = {
 };
 
 export function createBear(type = 'splashy') {
-    console.log(`[Bear V3] Creating bear of type: ${type}`);
+    console.log(`[Bear V4] Creating bear of type: ${type}`);
     
     const bearGroup = new THREE.Group();
     bearGroup.name = 'bear-character';
@@ -37,7 +37,7 @@ export function createBear(type = 'splashy') {
         mesh.position.set(position.x, position.y, position.z);
         bearGroup.add(mesh);
         bearGroup.bodyParts[name] = mesh;
-        console.log(`[Bear V3] Created and added ${name} at position (${position.x}, ${position.y}, ${position.z})`);
+        console.log(`[Bear V4] Created and added ${name} at position (${position.x}, ${position.y}, ${position.z})`);
         return mesh;
     }
     
@@ -50,7 +50,7 @@ export function createBear(type = 'splashy') {
     addPart('leftLeg', new THREE.BoxGeometry(0.5, 0.5, 0.5), bodyMat, {x: -0.5, y: -1, z: 0});
     addPart('rightLeg', new THREE.BoxGeometry(0.5, 0.5, 0.5), bodyMat, {x: 0.5, y: -1, z: 0});
     
-    // Create arms with pivots - this is the fish-holding arm (bear's right, screen left)
+    // Create arms with pivots - RIGHT ARM (fish-holding arm, bear's right, screen left)
     const rightArmPivot = new THREE.Group();
     rightArmPivot.name = 'rightArmPivot';
     rightArmPivot.position.set(-0.95, 0.1, -0.3);
@@ -60,12 +60,14 @@ export function createBear(type = 'splashy') {
     rightArm.name = 'rightArm';
     rightArm.position.set(0, 0, 0);
     rightArmPivot.add(rightArm);
+    
+    // Add to bear group and store references
     bearGroup.add(rightArmPivot);
     bearGroup.bodyParts.rightArmPivot = rightArmPivot;
     bearGroup.bodyParts.rightArm = rightArm;
-    console.log('[Bear V3] Created right arm pivot (fish-holding arm)');
+    console.log('[Bear V4] Created and added right arm pivot (fish-holding arm)');
     
-    // Left arm
+    // LEFT ARM
     const leftArmPivot = new THREE.Group();
     leftArmPivot.name = 'leftArmPivot';
     leftArmPivot.position.set(0.95, 0.1, -0.3);
@@ -75,10 +77,12 @@ export function createBear(type = 'splashy') {
     leftArm.name = 'leftArm';
     leftArm.position.set(0, 0, 0);
     leftArmPivot.add(leftArm);
+    
+    // Add to bear group and store references
     bearGroup.add(leftArmPivot);
     bearGroup.bodyParts.leftArmPivot = leftArmPivot;
     bearGroup.bodyParts.leftArm = leftArm;
-    console.log('[Bear V3] Created left arm pivot');
+    console.log('[Bear V4] Created and added left arm pivot');
     
     // Net collision area
     const netGroup = new THREE.Group();
@@ -90,7 +94,7 @@ export function createBear(type = 'splashy') {
     net.position.set(0, -1.3, -0.7);
     netGroup.add(net);
     bearGroup.add(netGroup);
-    console.log('[Bear V3] Added net collision area');
+    console.log('[Bear V4] Added net collision area');
     
     // Set up user data and methods
     bearGroup.userData = {
@@ -101,8 +105,9 @@ export function createBear(type = 'splashy') {
         isMovingWithKeys: false
     };
     
-    // Method to get the fish-holding hand
+    // Method to get the fish-holding hand - ALWAYS return the right arm pivot
     bearGroup.getFishHoldingHand = function() {
+        console.log('[Bear V4] getFishHoldingHand called, returning rightArmPivot:', this.bodyParts.rightArmPivot);
         return this.bodyParts.rightArmPivot;
     };
     
@@ -110,7 +115,7 @@ export function createBear(type = 'splashy') {
     bearGroup.position.set(0, 4.65, 0.8);
     bearGroup.rotation.y = Math.PI; // Face camera
     
-    console.log('[Bear V3] Bear creation complete with all parts');
+    console.log('[Bear V4] Bear creation complete. All parts:', Object.keys(bearGroup.bodyParts));
     return bearGroup;
 }
 
